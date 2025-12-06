@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vedic Mantra App</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <style>
+    body {
+      font-family: 'Noto Sans Devanagari', sans-serif;
+    }
+    .glass {
+      backdrop-filter: blur(10px);
+      background: rgba(255, 255, 255, 0.05);
+    }
+    .planet-symbol {
+      font-size: 2.5rem;
+      font-weight: bold;
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 0.3rem;
+    }
+  </style>
+</head>
+
+<body class="bg-gradient-to-br from-indigo-900 to-black min-h-screen text-white">
+  <!-- Change Birth Details Icon -->
+  <div class="absolute top-4 left-4">
+    <button onclick="resetApp()" title="Change Birth Details" class="text-white hover:text-yellow-300">
+      <i class="fas fa-user-edit fa-lg"></i>
+    </button>
+  </div>
+
+  <div id="landing" class="p-4 max-w-md mx-auto text-center mt-20">
+    <h1 class="text-3xl font-bold mb-6">Welcome to the Vedic Mantra App</h1>
+    <p class="mb-4">Enter your details to personalize your experience</p>
+    <input id="name" type="text" placeholder="Your Name" class="mb-2 px-4 py-2 rounded w-full text-black">
+    <input id="dob" type="date" class="mb-2 px-4 py-2 rounded w-full text-black">
+    <input id="tob" type="time" class="mb-2 px-4 py-2 rounded w-full text-black" placeholder="Time of Birth">
+    <input id="place" type="text" placeholder="Place of Birth" class="mb-4 px-4 py-2 rounded w-full text-black">
+    <button onclick="enterApp()" class="bg-yellow-500 text-black px-6 py-2 rounded font-bold">Enter</button>
+  </div>
+
+  <div id="app" class="hidden p-4">
+    <div id="welcome-box" class="text-center mb-6 text-xl font-semibold"></div>
+    <div id="hora-display" class="text-center text-sm text-white/70 mb-1"></div>
+    <div id="live-clock" class="text-center text-lg text-white font-bold mb-2"></div>
+    <div id="panchang-display" class="text-center text-xs text-white/60 mb-4"></div>
+    <div id="today-planet-box" class="max-w-md mx-auto mb-6 text-center font-bold text-xl text-yellow-300"></div>
+    <div id="planet-grid" class="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-5xl mx-auto"></div>
+  </div>
+
+  <script>
+    const planets = [
+      { symbol: '☉', name: 'Sun', day: 'Sunday', mantra: 'Om Suryaya Namaha', audio: 'sun-mantra.mp3', color: 'bg-gradient-to-r from-orange-500 to-red-600', benefit: 'Vitality, confidence, leadership, health' },
+      { symbol: '☽', name: 'Moon', day: 'Monday', mantra: 'Om Chandraya Namaha', audio: 'moon-mantra.mp3', color: 'bg-gradient-to-r from-blue-300 to-indigo-600', benefit: 'Vitality, confidence, leadership, health' },
+      { symbol: '♂', name: 'Mars', day: 'Tuesday', mantra: 'Om Mangalaya Namaha', audio: 'mars-mantra.mp3', color: 'bg-gradient-to-r from-red-500 to-red-800', benefit: 'Courage, energy, strength, determination' },
+      { symbol: '☿', name: 'Mercury', day: 'Wednesday', mantra: 'Om Budhaya Namaha', audio: 'mercury-mantra.mp3', color: 'bg-gradient-to-r from-green-400 to-emerald-600', benefit: 'Intelligence, communication, business' },
+      { symbol: '♃', name: 'Jupiter', day: 'Thursday', mantra: 'Om Gurave Namaha', audio: 'jupiter-mantra.mp3', color: 'bg-gradient-to-r from-yellow-300 to-amber-500 text-black', benefit: 'Wisdom, prosperity, spirituality' },
+      { symbol: '♀', name: 'Venus', day: 'Friday', mantra: 'Om Shukraya Namaha', audio: 'venus-mantra.mp3', color: 'bg-gradient-to-r from-pink-500 to-rose-500', benefit: 'Love, beauty, luxury, relationships' },
+      { symbol: '♄', name: 'Saturn', day: 'Saturday', mantra: 'Om Shanaischaraya Namaha', audio: 'saturn-mantra.mp3', color: 'bg-gradient-to-r from-gray-800 to-blue-900', benefit: 'Discipline, karma, longevity' }
+    ];
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const grid = document.getElementById('planet-grid');
+      const today = new Date().toLocaleDateString('en-US', { weekday: 'long' });
+      const todayPlanet = planets.find(p => p.day === today);
+
+      if (todayPlanet) {
+        document.getElementById('today-planet-box').textContent = `Today is ${today} – Focus on: ${todayPlanet.benefit}`;
+
+        const topBox = document.createElement('div');
+        topBox.className = `glass rounded p-4 ${todayPlanet.color}`;
+        topBox.innerHTML = `
+          <div class="planet-symbol">${todayPlanet.symbol}</div>
+          <div class="font-bold text-lg">${todayPlanet.name} (${todayPlanet.day})</div>
+          <p class="text-sm mt-2">Mantra: ${todayPlanet.mantra}</p>
+          <p class="text-xs mt-1 text-white/70">Benefit: ${todayPlanet.benefit}</p>
+          <audio controls class="mt-2">
+            <source src="${todayPlanet.audio}" type="audio/mpeg">
+            Your browser does not support the audio element.
+          </audio>
+          <div class="mt-2">
+            <label for="${todayPlanet.name.toLowerCase()}-count">Mala Count:</label>
+            <input id="${todayPlanet.name.toLowerCase()}-count" type="number" value="0" class="w-16 text-black text-center rounded">
+          </div>
+        `;
+        grid.appendChild(topBox);
+      }
+
+      planets.forEach(planet => {
+        if (planet.day === today) return;
+        const box = document.createElement('div');
+        box.className = `glass rounded p-4 ${planet.color}`;
+        box.innerHTML = `
+          <div class="planet-symbol">${planet.symbol}</div>
+          <div class="font-bold text-lg">${planet.name} (${planet.day})</div>
+          <p class="text-sm mt-2">Mantra: ${planet.mantra}</p>
+          <p class="text-xs mt-1 text-white/70">Benefit: ${planet.benefit}</p>
+          <audio controls class="mt-2">
+            <source src="${planet.audio}" type="audio/mpeg">
+            Your browser does not support the audio element.
+          </audio>
+          <div class="mt-2">
+            <label for="${planet.name.toLowerCase()}-count">Mala Count:</label>
+            <input id="${planet.name.toLowerCase()}-count" type="number" value="0" class="w-16 text-black text-center rounded">
+          </div>
+        `;
+        grid.appendChild(box);
+      });
+    });
+
+    function enterApp() {
+      document.getElementById('landing').classList.add('hidden');
+      document.getElementById('app').classList.remove('hidden');
+
+      const name = document.getElementById('name').value;
+      const welcomeText = `Namaste, ${name || 'Seeker'} 🌞 May your day be aligned with cosmic energies.`;
+      document.getElementById('welcome-box').textContent = welcomeText;
+    }
+
+    function resetApp() {
+      document.getElementById('app').classList.add('hidden');
+      document.getElementById('landing').classList.remove('hidden');
+    }
+  </script>
+</body>
+
+</html>
